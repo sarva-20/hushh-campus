@@ -40,3 +40,5 @@ class ClubOut(BaseModel):
 
 class KaiChat(BaseModel):
     message: str
+class ChatRequest(BaseModel):
+    message: str
