@@ -6,5 +6,12 @@ export const fetchEvents = async () => {
 
 export const createEvent = async (eventData) => {
     // The token is automatically attached by the interceptor in client.js
-    return await client.post('/events/', eventData);
+    const payload = {
+        title: eventData.title,
+        description: eventData.description,
+        venue: eventData.venue,
+        event_time: eventData.date,
+        join_link: eventData.join_link
+    };
+    return await client.post('/events/', payload);
 };
