@@ -8,7 +8,7 @@ from jose import jwt
 import os, random, string
 
 router = APIRouter()
-pwd_context = CryptContext(schemes=["bcrypt"])
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=12)
 SECRET = os.getenv("JWT_SECRET", "kaicampussecret")
 
 def generate_referral():
