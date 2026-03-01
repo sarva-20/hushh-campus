@@ -22,8 +22,8 @@ export const Login = () => {
         try {
             const response = await loginUser(formData.email, formData.password);
             // Save to localStorage
-            localStorage.setItem('kai_token', response.data.token);
-            localStorage.setItem('kai_user', JSON.stringify(response.data.user));
+            localStorage.setItem('kai_token', response.data.access_token);
+            localStorage.setItem('kai_user', JSON.stringify({ name: response.data.name }));
 
             // Redirect
             const hasOnboarded = localStorage.getItem('kai_onboarded');
