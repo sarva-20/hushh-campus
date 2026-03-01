@@ -1,43 +1,40 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
-from models import Event, Club
-from schemas import KaiChat
-import google.generativeai as genai
+from schemas import ChatRequest
+from google import genai
+
 import os
 
 router = APIRouter()
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel("gemini-1.5-flash")
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+
+SYSTEM_CONTEXT = """You are Kai, a friendly AI assistant for KPRIET college campus. 
+You help students discover events, join clubs, and navigate campus life. 
+Be concise, helpful, and energetic."""
 
 @router.post("/chat")
-def kai_chat(data: KaiChat, db: Session = Depends(get_db)):
-    events = db.query(Event).all()
-    clubs = db.query(Club).all()
-    
-    context = f"""You are Kai, a campus assistant for KPRIET college.
-    
-Current Events: {[{"title": e.title, "venue": e.venue, "time": str(e.event_time)} for e in events]}
-Clubs: {[{"name": c.name, "category": c.category, "description": c.description} for c in clubs]}
-
-Answer the student's question helpfully and concisely."""
-
-    response = model.generate_content(f"{context}\n\nStudent: {data.message}")
-    return {"response": response.text}
-
-@router.post("/chat")
-def kai_chat(data: KaiChat, db: Session = Depends(get_db)):
-    events = db.query(Event).all()
-    clubs = db.query(Club).all()
-    
-    context = f"""You are Kai, a campus assistant for KPRIET college.
-Current Events: {[{"title": e.title, "venue": e.venue, "time": str(e.event_time)} for e in events]}
-Clubs: {[{"name": c.name, "category": c.category, "description": c.description} for c in clubs]}
-Answer the student's question helpfully and concisely."""
-
+async def chat(request: ChatRequest, db: Session = Depends(get_db)):
     try:
-        response = model.generate_content(f"{context}\n\nStudent: {data.message}")
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=f"{SYSTEM_CONTEXT}\n\nStudent: {request.message}"
+        )
         return {"response": response.text}
     except Exception as e:
-        print(f"Gemini error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/recommend")
+async def recommend(request: ChatRequest, db: Session = Depends(get_db)):
+    try:
+        prompt = f"""Based on these interests: {request.message}
+        Recommend 2-3 college clubs from: GDSC, IEEE, Rotaract, Photography Club.
+        Be brief and enthusiastic."""
+        
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=prompt
+        )
+        return {"response": response.text}
+    except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
