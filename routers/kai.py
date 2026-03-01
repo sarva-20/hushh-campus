@@ -24,3 +24,17 @@ Answer the student's question helpfully and concisely."""
 
     response = model.generate_content(f"{context}\n\nStudent: {data.message}")
     return {"response": response.text}
+
+@router.post("/recommend")
+def recommend_clubs(data: KaiChat, db: Session = Depends(get_db)):
+    clubs = db.query(Club).all()
+    
+    context = f"""You are Kai, a campus assistant for KPRIET college.
+Available clubs: {[{"name": c.name, "category": c.category, "description": c.description} for c in clubs]}
+
+Based on the student's interests, recommend 2-3 clubs from the list above.
+Reply in this exact JSON format only:
+{{"recommendations": [{{"name": "club name", "reason": "one line reason"}}]}}"""
+
+    response = model.generate_content(f"{context}\n\nStudent interests: {data.message}")
+    return {"response": response.text}
