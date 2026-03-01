@@ -12,6 +12,25 @@ def startup_event():
         print("Database tables created successfully")
     except Exception as e:
         print(f"Warning: Could not initialize database on startup: {e}")
+def seed_data(db):
+    if db.query(Club).count() == 0:
+        clubs = [
+            Club(name="Google Developer Student Club", description="Build with Google tech", category="Tech", join_link="https://chat.whatsapp.com/example1", logo_url=""),
+            Club(name="IEEE Student Branch", description="Engineering excellence", category="Tech", join_link="https://chat.whatsapp.com/example2", logo_url=""),
+            Club(name="Rotaract Club", description="Community service and leadership", category="Social", join_link="https://chat.whatsapp.com/example3", logo_url=""),
+            Club(name="Photography Club", description="Capture moments, tell stories", category="Arts", join_link="https://chat.whatsapp.com/example4", logo_url=""),
+        ]
+        db.add_all(clubs)
+        db.commit()
+
+from database import SessionLocal
+db = SessionLocal()
+try:
+    seed_data(db)
+except:
+    pass
+finally:
+    db.close()
 
 app.add_middleware(
     CORSMiddleware,
