@@ -182,7 +182,13 @@ export const Onboarding = () => {
                                         {club.description && <p className="text-muted" style={{ margin: 0 }}>{club.description}</p>}
                                         {club.category && <span className="doodle-tag text-primary" style={{ marginTop: '1rem', display: 'inline-block' }}>{club.category}</span>}
                                     </div>
-                                    <button className="btn btn-outline doodle-border">
+                                    <button
+                                        className="btn btn-outline doodle-border"
+                                        onClick={() => {
+                                            localStorage.setItem('kai_onboarded', 'true');
+                                            navigate('/clubs');
+                                        }}
+                                    >
                                         Join Community
                                     </button>
                                 </motion.div>
