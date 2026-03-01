@@ -63,12 +63,22 @@ export const Navbar = () => {
 
                 {/* Auth Actions */}
                 <div style={{ display: 'flex', gap: '1rem' }}>
-                    <Link to="/login">
-                        <Button variant="ghost" size="sm">Log in</Button>
-                    </Link>
-                    <Link to="/register">
-                        <Button variant="primary" size="sm">Join Now</Button>
-                    </Link>
+                    {localStorage.getItem('kai_token') ? (
+                        <Button variant="ghost" size="sm" onClick={() => {
+                            localStorage.removeItem('kai_token');
+                            localStorage.removeItem('kai_user');
+                            window.location.href = '/';
+                        }}>Log out</Button>
+                    ) : (
+                        <>
+                            <Link to="/login">
+                                <Button variant="ghost" size="sm">Log in</Button>
+                            </Link>
+                            <Link to="/register">
+                                <Button variant="primary" size="sm">Join Now</Button>
+                            </Link>
+                        </>
+                    )}
                 </div>
             </div>
         </nav>
